@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- 自动扫描三个包 -->
+    <context:component-scan base-package="com.yys.controller" />
+    <context:component-scan base-package="com.yys.dao"/>
+    <context:component-scan base-package="com.yys.service"/>
+
+    <!-- 数据源-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://123.207.234.226:3306/blog?useUnicode=true&amp;characterEncoding=utf8" />
+        <property name="username" value="zch" />
+        <property name="password" value="999999,," />
+    </bean>
+
+    <!--配置session工厂，由mybatis-spring整合包提供, -至少配置一个属性：数据源-->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="typeAliasesPackage" value="com.yys.entity" />
+        <property name="mapperLocations" value="classpath:mappers/CategoryDao.xml" />
+    </bean>
+
+    <!--映射器接口 ,因为是自动调用的，所以不需要指定ID,由mybatis-spring整合包里提供-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sessionFactory"/>
+        <property name="basePackage" value="com.yys.dao" />
+    </bean>
+
+    <!-- service 相关 -->
+    <!--自动代理-->
+    <aop:aspectj-autoproxy />
+    <!--事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!---配置通知, transaction-manager的值是指定事务管理器，上一个bean的id-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <!--以配置属性的方式。指定对哪些方法进行过滤,,read-only="true" 说白了就是只读，不用事务去封装;  propagation="REQUIRED" 是说强制开启一个事务-->
+        <tx:attributes>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="search*" read-only="true" />
+            <tx:method name="*" propagation="REQUIRED" />
+        </tx:attributes>
+    </tx:advice>
+
+    <!--把通知和切入点关联起来-->
+    <aop:config>
+        <!--对com.zch.oa.service包的所有类的所有方法，所有参数的方法进行过滤，过滤规则是id="txAdvice"-->
+        <aop:pointcut id="txpc" expression="execution(* com.yys.service.*.*(..))" />
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txpc" />
+    </aop:config>
+
+    <!-- web 相关 -->
+    <!--开启mvc注解驱动-->
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8" />
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+
+    <!--静态资源交个servlet处理,比如图片-->
+    <mvc:default-servlet-handler />
+
+    <!--配置视图转换器，不需要调用，因此不需要配置ID,需要配置三个属性-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/views/"/>
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+    <!--登录拦截,最少配置2个，path,拦截哪些地址，bean,用哪个bean进行拦截处理-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.yys.global.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+</beans>

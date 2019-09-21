@@ -3,6 +3,7 @@ package com.yys.service.impl;
 import com.yys.dao.CategoryDao;
 import com.yys.entity.Category;
 import com.yys.service.CategoryService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -18,7 +19,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void insert(Category category) {
-        category.setPid(0);
+        if(category.getPid()==null) {
+            category.setPid(1);
+        }
         categoryDao.insert(category);
     }
 
@@ -29,6 +32,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void update(Category category) {
+        if(category.getPid()==null) {
+            category.setPid(1);
+        }
         categoryDao.update(category);
     }
 
@@ -41,5 +47,8 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryDao.getAll();
     }
 
+    public List<Category> getByParam(@Param("limit") Integer limit){
+        return  categoryDao.getByParam(limit);
+    }
 
 }

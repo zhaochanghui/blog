@@ -8,17 +8,24 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@page isELIgnored="false" %>
-<html>
-<head>
-    <title>Title</title>
-</head>
-<body>
-list<br>
+
+<jsp:include page="../top.jsp" />
+
+<h1 class="page-header">Dashboard</h1>
+
+<div class="row placeholders">
+
+</div>
+
+<h2 class="sub-header">Section title</h2>
+<div class="table-responsive">
+
 <c:forEach items="${list}" var="item">
     <p>n:${item.name}| p:${item.parent.name}
         <a href="<%=request.getContextPath()%>/category/to_update?id=${item.id}">update</a>
         <a href="<%=request.getContextPath()%>/category/delete?id=${item.id}">del</a>
     </p>
 </c:forEach>
-</body>
-</html>
+
+</div>
+<jsp:include page="../bottom.jsp" />

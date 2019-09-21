@@ -1,6 +1,7 @@
 package com.yys.dao;
 
 import com.yys.entity.Category;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface CategoryDao {
     void update(Category category);
     Category select(Integer id);
     List<Category> getAll();
+    List<Category> getByParam(@Param("limit") Integer limit);
 }

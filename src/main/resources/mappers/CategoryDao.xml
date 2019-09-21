@@ -7,10 +7,6 @@
         <id property="id" column="id" javaType="Integer"/>
         <result property="name" column="name" javaType="String"/>
         <result property="pid" column="pid" javaType="Integer"/>
-        <association property="parent" column="pid" javaType="Category">
-            <id property="id" column="parent_id" javaType="Integer" />
-            <result property="name" column="parent_name" javaType="String"/>
-        </association>
     </resultMap>
 
     <insert id="insert" parameterType="Category" useGeneratedKeys="true" keyColumn="id">
@@ -33,5 +29,12 @@
     <select id="getAll" resultMap="category">
         select c.*,sub.id as parent_id,sub.name as parent_name from category as c
         left join category as sub on c.pid=sub.id and sub.pid>0 where c.pid!=c.id
+    </select>
+
+    <select id="getByParam" parameterType="Category" resultMap="category">
+        select * from category
+        <if test="limit!=null">
+            limit #{limit}
+        </if>
     </select>
 </mapper>

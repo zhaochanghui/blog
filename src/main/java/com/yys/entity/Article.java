@@ -1,5 +1,7 @@
 package com.yys.entity;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 /*
@@ -22,7 +24,9 @@ public class Article {
     private Integer subCategory;
     private String brief;
     private String content;
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm")
     private Date createTime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm")
     private Date updateTime;
 
     private Category category;

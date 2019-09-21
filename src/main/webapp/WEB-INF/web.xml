@@ -4,6 +4,12 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
   <!-- 解决post乱码 -->
+
+
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+
   <filter>
     <filter-name>CharacterEncodingFilter</filter-name>
     <filter-class>com.yys.global.EncodingFilter</filter-class>
@@ -26,9 +32,25 @@
       <param-value>classpath:spring/spring-*.xml</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
+    <!--文件上传配置-->
+    <multipart-config>
+      <location>/</location>
+      <max-file-size>2097152</max-file-size>
+      <max-request-size>4194304</max-request-size>
+    </multipart-config>
   </servlet>
   <servlet-mapping>
     <servlet-name>springmvc</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Kaptcha</servlet-name>
+    <servlet-class>com.google.code.kaptcha.servlet.KaptchaServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Kaptcha</servlet-name>
+    <url-pattern>/kaptcha</url-pattern>
+  </servlet-mapping>
+
 </web-app>
